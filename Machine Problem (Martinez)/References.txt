@@ -1,0 +1,10 @@
+References Used:
+
+Practical Numerical Methods with C# by Jack Xu
+Numerical Methods with C++ Programing by Nita H. Shah
+Numerical Methods, Algorithms and Tools in C# by Waldemar Dos Passos
+Numerical Methods with Computer Programs in C++ by Pallab Ghosh
+Fundamental C# Programming
+Microsoft DotNet by Morgan Kuaffman
+
+

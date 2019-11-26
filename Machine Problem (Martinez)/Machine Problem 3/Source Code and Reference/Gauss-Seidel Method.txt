@@ -1,0 +1,102 @@
+//Source code for Gauss-Seidel method
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Gauss_Seidel_Method
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+            textBoxA11.Select();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            double A11, A12, A13, A21, A22, A23, A31, A32, A33, C1, C2, C3, x1 = 0, x2 = 0, x3 = 0;
+            double prevx1 = 0, prevx2 = 0, prevx3 = 0, t = 0;
+            double terminate_condition = 0;
+            terminate_condition = double.Parse(textBoxE.Text);
+
+            A11 = double.Parse(textBoxA11.Text);
+            A12 = double.Parse(textBoxA12.Text);
+            A13 = double.Parse(textBoxA13.Text);
+            C1 = double.Parse(textBoxC1.Text);
+
+            A21 = double.Parse(textBoxA21.Text);
+            A22 = double.Parse(textBoxA22.Text);
+            A23 = double.Parse(textBoxA23.Text);
+            C2 = double.Parse(textBoxC2.Text);
+
+            A31 = double.Parse(textBoxA31.Text);
+            A32 = double.Parse(textBoxA32.Text);
+            A33 = double.Parse(textBoxA33.Text);
+            C3 = double.Parse(textBoxC3.Text);
+
+            int i = 1;
+            do
+            {
+                prevx1 = x1;
+                prevx1 = Math.Floor(prevx1 * 10000 + 0.5) / 10000;
+                prevx2 = x2;
+                prevx2 = Math.Floor(prevx2 * 10000 + 0.5) / 10000;
+                prevx3 = x3;
+                prevx3 = Math.Floor(prevx3 * 10000 + 0.5) / 10000;
+
+                x1 = Math.Round((C1 - A12 * x2 - A13 * x3) / A11, 4);
+                x1 = Math.Floor(x1 * 10000 + 0.5) / 10000;
+
+                x2 = Math.Round((C2 - A21 * x1 - A23 * x3) / A22, 4);
+                x2 = Math.Floor(x2 * 10000 + 0.5) / 10000;
+
+                x3 = Math.Round((C3 - A31 * x1 - A32 * x2) / A33, 4);
+                x3 = Math.Floor(x3 * 10000 + 0.5) / 10000;
+
+                richTextBox1.Text += i.ToString() + Environment.NewLine;
+                richTextBox2.Text += x1.ToString() + Environment.NewLine;
+                richTextBox3.Text += x2.ToString() + Environment.NewLine;
+                richTextBox4.Text += x3.ToString() + Environment.NewLine;
+                i++;
+            } while ((Math.Floor(Math.Abs(x1 - prevx1) * 10000 + 0.5) / 10000 > terminate_condition) || (Math.Floor(Math.Abs(x2 - prevx2) * 10000 + 0.5) / 10000 > terminate_condition) || (Math.Floor(Math.Abs(x3 - prevx3) * 10000 + 0.5) / 10000 > terminate_condition));
+            t = x1 - prevx1;
+            if (t < 0)
+            {
+                x1 = prevx1;
+                x2 = prevx2;
+                x3 = prevx3;
+            }
+         
+       
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            textBoxA11.Clear();
+            textBoxA12.Clear();
+            textBoxA13.Clear();
+            textBoxA21.Clear();
+            textBoxA22.Clear();
+            textBoxA23.Clear();
+            textBoxA31.Clear();
+            textBoxA32.Clear();
+            textBoxA33.Clear();
+            textBoxC1.Clear();
+            textBoxC2.Clear();
+            textBoxC3.Clear();
+            textBoxE.Clear();
+            richTextBox1.Clear();
+            richTextBox2.Clear(); 
+            richTextBox3.Clear(); 
+            richTextBox4.Clear();
+        }
+    }
+}

@@ -1,0 +1,140 @@
+//Source code for Bairstow's method
+#include<stdio.h>
+#include<conio.h>
+#include<math.h>
+#include<iostream>
+#include<Windows.h>
+#define ESP 0.001
+#define F(x) a3*(x)*(x)*(x) + a2*(x)*(x) + a1*(x) + a0
+
+
+using namespace std;
+int main()
+{
+	HANDLE hConsole;
+	hConsole = GetStdHandle (STD_OUTPUT_HANDLE);
+	double a3,a2,a1,a0;
+	system("color 20");
+	cout<<"\n\t\t\t......Bairstow's Method......\n\n"<<endl;
+	cout<<"\t\t  F(x) = a3*(x)^3 + a2*(x)^2 + a1*(x) + a0\n\n";
+	cout<<" Following the format of the equaion above please enter a value \n";
+	cout<<"\n Enter the value of a3: ";
+	cin>>a3;
+	cout<<endl;
+	cout<<" Enter the value of a2: ";
+	cin>>a2;
+	cout<<endl;
+	cout<<" Enter the value of a1: ";
+	cin>>a1;
+	cout<<endl;
+	cout<<" Enter the value of a0: ";
+	cin>>a0;
+	cout<<endl;
+
+  double u,v,u1,v1,u2,v2,b3,b2,p,b1,b0,c2,c1,c0,U,V;
+  int i=1;
+  float c3=0;
+  system("cls");
+  printf("\n Enter the value of r: ");
+  scanf("%lf",&u);
+  printf("\n Enter the value of s: ");
+  scanf("%lf",&v);
+  b3=a3;
+  b2=a2+u*b3;
+  b1=a1+u*b2+v*b3;
+  b0=a0+u*b1+v*b2;
+  c2=b3;
+  c1=b2+u*c2+v*c3;
+  c0=b1+u*c1+v*c2;
+  p=c1*c1-c0*c2;
+  U=((-(b1*c1-b0*c2))/(p));
+  V=((-(b0*c1-c0*b1))/(p));
+  u1=u+U;
+  v1=v+V;
+  printf("\n\n b0 = %lf",b0);
+  printf("\n\n b1 = %lf",b1);
+  printf("\n\n b2 = %lf",b2);
+  printf("\n\n b3 = %lf",b3);
+  printf("\n\n c1 = %lf",c0);
+  printf("\n\n c2 = %lf",c1);
+  printf("\n\n c3 = %lf",c2);
+  printf("\n\n c0 = %lf",c3);
+  printf ("\n");
+  printf("\n\n [ r = %lf  ]",u1);
+  printf("\n\n [ s = %lf  ]",v1);
+  Sleep(3000);
+
+  do
+  {
+   u=u1;
+   v=v1;
+   b3=a3;
+   b2=a2+u*b3;
+   b1=a1+u*b2+v*b3;
+   b0=a0+u*b1+v*b2;
+   c2=b3;
+   c1=b2+u*c2+v*c3;
+   c0=b1+u*c1+v*c2;
+   p=c1*c1-c0*c2;
+   U=((-(b1*c1-b0*c2))/(p));
+   V=((-(b0*c1-c0*b1))/(p));
+   u2=u+U;
+   v2=v+V;
+   printf("\n");
+   printf("\n\n b0 = %lf",b0);
+   printf("\n\n b1 = %lf",b1);
+   printf("\n\n b2 = %lf",b2);
+   printf("\n\n b3 = %lf",b3);
+   printf("\n\n c1 = %lf",c0);
+   printf("\n\n c2 = %lf",c1);
+   printf("\n\n c3 = %lf",c2);
+   printf("\n\n c0 = %lf",c3);
+   printf("\n\n [ r = %lf  ]",u2);
+   printf("\n\n [ s = %lf  ]",v2);
+
+   if(fabs(u1 - u2) < ESP && fabs(v1-v2) < ESP)
+   {
+	printf("\n");   
+    printf("\n\n r* = %.3lf",u2);
+    printf("\n\n s* = %.3lf",v2);
+    i=0;
+   }
+   else
+   {
+     u1 = u2;
+     v1 = v2;
+   }
+   Sleep(3000);
+  }while(i!=0);
+  
+  double root1,root2,root3,h,f;
+  h=(u2*u2)+(4*v2);
+  
+  if(h<0)
+  {
+  h=(-h);
+  root1=u2/2;
+  root2=v2/2;
+  f=sqrt(h)/2;
+  cout<<'\a';
+  SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+  cout<<"\n\n root 1 is "<<root1<<" + "<<f<<"j";
+  cout<<"\n root 2 is "<<root1<<" - "<<f<<"j";
+  }
+  else
+  {
+  cout<<'\a';
+  SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+  root1=u2+sqrt((u2*u2)+(4*v2))/2;
+  root2=u2-sqrt((u2*u2)+(4*v2))/2;
+  cout<<"\n\n root 1 is "<<root1;
+  cout<<"\n root 2 is "<<root2;
+  }
+
+  double a,b;
+  a=a2+u2;
+  b=a1+v2;
+  SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+  cout<<"\n root 3 is "<<-a;
+  getch();
+}

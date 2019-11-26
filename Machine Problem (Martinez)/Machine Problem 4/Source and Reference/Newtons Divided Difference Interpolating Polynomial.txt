@@ -1,0 +1,769 @@
+using System;
+using System.Windows.Forms;
+
+namespace MP2COE60
+{
+    public partial class frmMain : Form
+    {
+        NewtonsDivided methods = new NewtonsDivided();
+        decimal answer;
+        private static int ctr;
+        private static decimal[,] iOutput;
+        private static decimal[] dOutput;
+        int myCount = 0;
+        //
+        private static int N, counter;
+        private static decimal[] xList, yList;
+
+        public void DisplayTable(int indicator, int method)
+        {
+            dataTable.Rows.Clear();
+            dataTable.Columns.Clear();
+            if (indicator == 0)
+            {
+                dataTable.Columns.Add("X", "x");
+                dataTable.Columns.Add("FX", "F(x)");
+                if(method==1)
+                    dataTable.Columns.Add("TrapezoidalRule", "Trapezoidal Rule");
+                else if(method==2)
+                    dataTable.Columns.Add("Simpson's1/3Rule", "Simpson's 1/3 Rule");
+                else
+                    dataTable.Columns.Add("Simpson's3/8Rule", "Simpson's 3/8 Rule");
+                iOutput = methods.GetiTable();
+                try { dataTable.Rows.Add(ctr); }
+                catch (ArgumentOutOfRangeException) { }
+                try
+                {
+                    for (int i = 0; i < ctr; i++)
+                    {
+                        try
+                        {
+                            dataTable.Rows[i].Cells[0].Value = iOutput[i, 0];
+                            dataTable.Rows[i].Cells[1].Value = iOutput[i, 1];
+                            dataTable.Rows[i].Cells[2].Value = iOutput[i, 2];
+                        }
+                        catch (IndexOutOfRangeException) { }
+                    }
+                }
+                catch (NullReferenceException) { }
+            }
+            else if (indicator == 1)
+            {
+                if (method == 1)
+                {
+                    dataTable.Columns.Add("XI", "Xi");
+                    dataTable.Columns.Add("XINEXT", "Xi+1");
+                    dataTable.Columns.Add("FXI", "F(Xi)");
+                    dataTable.Columns.Add("FXI+1", "F(Xi+1)");
+                    dataTable.Columns.Add("DerivativeEstimate", "I(T)/F'(Xi)");
+                }
+                else if (method == 2)
+                {
+                    dataTable.Columns.Add("XI", "Xi");
+                    dataTable.Columns.Add("XIPREVIOUS", "Xi-1");
+                    dataTable.Columns.Add("FXI", "F(Xi)");
+                    dataTable.Columns.Add("FXI-1", "F(Xi-1)");
+                    dataTable.Columns.Add("DerivativeEstimate", "I(T)/F'(Xi)");
+                }
+                else if (method == 3)
+                {
+                    dataTable.Columns.Add("XINEXT", "Xi+1");
+                    dataTable.Columns.Add("XIPREVIOUS", "Xi-1");
+                    dataTable.Columns.Add("FXI+1", "F(Xi+1)");
+                    dataTable.Columns.Add("FXI-1", "F(Xi-1)");
+                    dataTable.Columns.Add("DerivativeEstimate", "I(T)/F'(Xi)");
+                }
+                dOutput = methods.GetdTable();
+                try
+                {
+                    try { dataTable.Rows.Add(1); }
+                    catch (InvalidOperationException) { }
+                    try
+                    {
+                        dataTable.Rows[0].Cells[0].Value = dOutput[0];
+                        dataTable.Rows[0].Cells[1].Value = dOutput[1];
+                        dataTable.Rows[0].Cells[2].Value = dOutput[2];
+                        dataTable.Rows[0].Cells[3].Value = dOutput[3];
+                        dataTable.Rows[0].Cells[4].Value = dOutput[4];
+                    }
+                    catch (ArgumentOutOfRangeException) { }
+                }
+                catch (NullReferenceException) { }
+            }
+            else
+            {
+                dataTable.Rows.Clear();
+                dataTable.Columns.Clear();
+            }
+        }
+
+        public void DisplayData()
+        {
+            dataTable.Rows.Clear();
+            dataTable.Columns.Clear();
+            dataTable.Columns.Add("X", "X");
+            dataTable.Columns.Add("Fx", "F(X)");
+            for (int i = 0; i < N; i++)
+                dataTable.Columns.Add("Fx", "");
+            dataTable.Rows.Add(N);
+            for (int i = 0; i < N; i++)
+            {
+                dataTable.Rows[i].Cells[0].Value = xList[i];
+                dataTable.Rows[i].Cells[1].Value = yList[i];
+            }
+            decimal[,] Output;// 
+            Output = methods.GetList();
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = 0; j < N - (i + 1); j++)
+                {
+                    dataTable.Rows[i].Cells[2 + j].Value = Output[i, j];
+                }
+            }
+        }
+        public frmMain()
+        {
+            InitializeComponent();
+        }
+
+        private void btnEnterNumber_Click(object sender, EventArgs e)
+        {     
+            try
+            {   
+                if (int.Parse(txtBoxNumber.Text) > 0)
+                {
+                    N = int.Parse(txtBoxNumber.Text);
+                    txtBoxNumber.Enabled = false;
+                    btnEnterNumber.Enabled = false;
+                    counter = 0;
+                    xList = new decimal[N];
+                    yList = new decimal[N];
+                    groupBox1.Enabled = true;
+                    txtBoxX.Enabled = true;
+                    txtBoxFx.Enabled = true;
+                    btnStore.Enabled = true;
+                }
+                else
+                    MessageBox.Show("Number of elements invalid input!");
+            }
+            catch(FormatException E)
+            {
+                MessageBox.Show(E.Message, "Error Message", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnStore_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                xList[counter] = decimal.Parse(txtBoxX.Text);
+                yList[counter] = decimal.Parse(txtBoxFx.Text);
+                counter++;
+                myCount++;
+            }
+            catch (FormatException E)
+            {
+                MessageBox.Show(E.Message, "Error Display", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            if (counter == N)
+            {
+                MessageBox.Show("Input Target:");
+                txtBoxTarget.Enabled = true;
+                btnCompute.Enabled = true;
+                txtBoxFx.Clear(); txtBoxX.Clear();
+                txtBoxX.Enabled = false; txtBoxFx.Enabled = false;
+                btnStore.Enabled = false;
+            }
+            else
+            {
+                MessageBox.Show("Inputted.");
+                txtBoxX.Clear();
+                txtBoxFx.Clear();
+            }
+            txtCounter.Text = myCount.ToString();
+        }
+
+        private void btnCompute_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                decimal target = decimal.Parse(txtBoxTarget.Text);
+                decimal answer = methods.NewtonsInterpolation(N, xList, yList, target);
+                txtBoxGeneratedFunction.Text = methods.GenerateFunction();
+                txtBoxTarget.Text = Convert.ToString(answer);
+                MessageBox.Show(answer.ToString());
+                DisplayData();
+                MessageBox.Show(methods.GenerateFunction());
+                txtBoxGeneratedFunction.Enabled = true;
+            }
+            catch (FormatException E)
+            {
+                MessageBox.Show(E.Message, "Error Display", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void group_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            dataTable.ClearSelection();
+            txtBoxTarget.Clear();
+            txtBoxFx.Clear();
+            txtBoxGeneratedFunction.Clear();
+            txtBoxNumber.Clear();
+            txtBoxX.Clear();
+            txtCounter.Clear();
+            btnEnterNumber.Enabled = true;
+            btnStore.Enabled = true;
+            txtBoxX.Enabled = true;
+            txtBoxFx.Enabled = true;
+            txtBoxNumber.Enabled = true;
+            counter = 0;
+            myCount = 0;
+
+            
+
+        }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void txtCounter_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+    }
+}
+
+namespace MP2COE60
+{
+    partial class frmMain
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
+			this.dataTable = new System.Windows.Forms.DataGridView();
+			this.lblNumber = new System.Windows.Forms.Label();
+			this.txtBoxNumber = new System.Windows.Forms.TextBox();
+			this.lblX = new System.Windows.Forms.Label();
+			this.txtBoxX = new System.Windows.Forms.TextBox();
+			this.lblFx = new System.Windows.Forms.Label();
+			this.txtBoxFx = new System.Windows.Forms.TextBox();
+			this.lblTarget = new System.Windows.Forms.Label();
+			this.txtBoxTarget = new System.Windows.Forms.TextBox();
+			this.btnEnterNumber = new System.Windows.Forms.Button();
+			this.btnStore = new System.Windows.Forms.Button();
+			this.btnCompute = new System.Windows.Forms.Button();
+			this.txtBoxGeneratedFunction = new System.Windows.Forms.TextBox();
+			this.lblFunction = new System.Windows.Forms.Label();
+			this.group = new System.Windows.Forms.GroupBox();
+			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.label1 = new System.Windows.Forms.Label();
+			this.txtCounter = new System.Windows.Forms.TextBox();
+			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+			this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.button1 = new System.Windows.Forms.Button();
+			this.label2 = new System.Windows.Forms.Label();
+			((System.ComponentModel.ISupportInitialize)(this.dataTable)).BeginInit();
+			this.group.SuspendLayout();
+			this.groupBox1.SuspendLayout();
+			this.menuStrip1.SuspendLayout();
+			this.SuspendLayout();
+			// 
+			// dataTable
+			// 
+			this.dataTable.AllowUserToAddRows = false;
+			this.dataTable.AllowUserToDeleteRows = false;
+			this.dataTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+			this.dataTable.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
+			dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+			dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+			dataGridViewCellStyle1.Font = new System.Drawing.Font("Franklin Gothic Demi", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+			dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+			dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+			dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+			this.dataTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+			this.dataTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			this.dataTable.Location = new System.Drawing.Point(15, 305);
+			this.dataTable.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.dataTable.Name = "dataTable";
+			this.dataTable.ReadOnly = true;
+			this.dataTable.RowTemplate.Height = 24;
+			this.dataTable.Size = new System.Drawing.Size(434, 166);
+			this.dataTable.TabIndex = 9;
+			// 
+			// lblNumber
+			// 
+			this.lblNumber.AutoSize = true;
+			this.lblNumber.Location = new System.Drawing.Point(25, 24);
+			this.lblNumber.Name = "lblNumber";
+			this.lblNumber.Size = new System.Drawing.Size(51, 16);
+			this.lblNumber.TabIndex = 0;
+			this.lblNumber.Text = "number:";
+			// 
+			// txtBoxNumber
+			// 
+			this.txtBoxNumber.BackColor = System.Drawing.Color.WhiteSmoke;
+			this.txtBoxNumber.Location = new System.Drawing.Point(138, 20);
+			this.txtBoxNumber.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.txtBoxNumber.Name = "txtBoxNumber";
+			this.txtBoxNumber.Size = new System.Drawing.Size(114, 21);
+			this.txtBoxNumber.TabIndex = 16;
+			// 
+			// lblX
+			// 
+			this.lblX.AutoSize = true;
+			this.lblX.Location = new System.Drawing.Point(18, 28);
+			this.lblX.Name = "lblX";
+			this.lblX.Size = new System.Drawing.Size(17, 16);
+			this.lblX.TabIndex = 0;
+			this.lblX.Text = "x:";
+			// 
+			// txtBoxX
+			// 
+			this.txtBoxX.BackColor = System.Drawing.Color.WhiteSmoke;
+			this.txtBoxX.Enabled = false;
+			this.txtBoxX.Location = new System.Drawing.Point(43, 24);
+			this.txtBoxX.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.txtBoxX.Name = "txtBoxX";
+			this.txtBoxX.Size = new System.Drawing.Size(113, 21);
+			this.txtBoxX.TabIndex = 18;
+			// 
+			// lblFx
+			// 
+			this.lblFx.AutoSize = true;
+			this.lblFx.Location = new System.Drawing.Point(8, 59);
+			this.lblFx.Name = "lblFx";
+			this.lblFx.Size = new System.Drawing.Size(30, 16);
+			this.lblFx.TabIndex = 0;
+			this.lblFx.Text = "f(X):";
+			// 
+			// txtBoxFx
+			// 
+			this.txtBoxFx.BackColor = System.Drawing.Color.WhiteSmoke;
+			this.txtBoxFx.Enabled = false;
+			this.txtBoxFx.Location = new System.Drawing.Point(43, 55);
+			this.txtBoxFx.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.txtBoxFx.Name = "txtBoxFx";
+			this.txtBoxFx.Size = new System.Drawing.Size(113, 21);
+			this.txtBoxFx.TabIndex = 19;
+			this.txtBoxFx.Text = " ";
+			// 
+			// lblTarget
+			// 
+			this.lblTarget.AutoSize = true;
+			this.lblTarget.Location = new System.Drawing.Point(13, 161);
+			this.lblTarget.Name = "lblTarget";
+			this.lblTarget.Size = new System.Drawing.Size(48, 16);
+			this.lblTarget.TabIndex = 0;
+			this.lblTarget.Text = "X value:";
+			// 
+			// txtBoxTarget
+			// 
+			this.txtBoxTarget.BackColor = System.Drawing.Color.WhiteSmoke;
+			this.txtBoxTarget.Enabled = false;
+			this.txtBoxTarget.Location = new System.Drawing.Point(96, 156);
+			this.txtBoxTarget.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.txtBoxTarget.Name = "txtBoxTarget";
+			this.txtBoxTarget.Size = new System.Drawing.Size(139, 21);
+			this.txtBoxTarget.TabIndex = 22;
+			// 
+			// btnEnterNumber
+			// 
+			this.btnEnterNumber.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+			this.btnEnterNumber.Location = new System.Drawing.Point(288, 29);
+			this.btnEnterNumber.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.btnEnterNumber.Name = "btnEnterNumber";
+			this.btnEnterNumber.Size = new System.Drawing.Size(93, 25);
+			this.btnEnterNumber.TabIndex = 17;
+			this.btnEnterNumber.Text = "ENTER";
+			this.btnEnterNumber.UseVisualStyleBackColor = true;
+			this.btnEnterNumber.Click += new System.EventHandler(this.btnEnterNumber_Click);
+			// 
+			// btnStore
+			// 
+			this.btnStore.Enabled = false;
+			this.btnStore.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+			this.btnStore.Location = new System.Drawing.Point(281, 34);
+			this.btnStore.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.btnStore.Name = "btnStore";
+			this.btnStore.Size = new System.Drawing.Size(93, 30);
+			this.btnStore.TabIndex = 20;
+			this.btnStore.Text = "STORE";
+			this.btnStore.UseVisualStyleBackColor = true;
+			this.btnStore.Click += new System.EventHandler(this.btnStore_Click);
+			// 
+			// btnCompute
+			// 
+			this.btnCompute.Enabled = false;
+			this.btnCompute.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+			this.btnCompute.Location = new System.Drawing.Point(288, 158);
+			this.btnCompute.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.btnCompute.Name = "btnCompute";
+			this.btnCompute.Size = new System.Drawing.Size(93, 25);
+			this.btnCompute.TabIndex = 23;
+			this.btnCompute.Text = "COMPUTE";
+			this.btnCompute.UseVisualStyleBackColor = true;
+			this.btnCompute.Click += new System.EventHandler(this.btnCompute_Click);
+			// 
+			// txtBoxGeneratedFunction
+			// 
+			this.txtBoxGeneratedFunction.BackColor = System.Drawing.Color.WhiteSmoke;
+			this.txtBoxGeneratedFunction.Enabled = false;
+			this.txtBoxGeneratedFunction.Location = new System.Drawing.Point(94, 244);
+			this.txtBoxGeneratedFunction.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.txtBoxGeneratedFunction.Name = "txtBoxGeneratedFunction";
+			this.txtBoxGeneratedFunction.Size = new System.Drawing.Size(198, 21);
+			this.txtBoxGeneratedFunction.TabIndex = 21;
+			// 
+			// lblFunction
+			// 
+			this.lblFunction.AutoSize = true;
+			this.lblFunction.Location = new System.Drawing.Point(18, 248);
+			this.lblFunction.Name = "lblFunction";
+			this.lblFunction.Size = new System.Drawing.Size(58, 16);
+			this.lblFunction.TabIndex = 0;
+			this.lblFunction.Text = "Equation:";
+			// 
+			// group
+			// 
+			this.group.BackColor = System.Drawing.Color.Gainsboro;
+			this.group.Controls.Add(this.groupBox1);
+			this.group.Controls.Add(this.txtBoxNumber);
+			this.group.Controls.Add(this.btnCompute);
+			this.group.Controls.Add(this.lblTarget);
+			this.group.Controls.Add(this.lblNumber);
+			this.group.Controls.Add(this.txtBoxTarget);
+			this.group.Controls.Add(this.btnEnterNumber);
+			this.group.ForeColor = System.Drawing.Color.DimGray;
+			this.group.Location = new System.Drawing.Point(15, 31);
+			this.group.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.group.Name = "group";
+			this.group.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.group.Size = new System.Drawing.Size(434, 192);
+			this.group.TabIndex = 25;
+			this.group.TabStop = false;
+			this.group.Text = "Data";
+			this.group.Enter += new System.EventHandler(this.group_Enter);
+			// 
+			// groupBox1
+			// 
+			this.groupBox1.BackColor = System.Drawing.Color.Gainsboro;
+			this.groupBox1.Controls.Add(this.label1);
+			this.groupBox1.Controls.Add(this.txtCounter);
+			this.groupBox1.Controls.Add(this.txtBoxX);
+			this.groupBox1.Controls.Add(this.txtBoxFx);
+			this.groupBox1.Controls.Add(this.lblFx);
+			this.groupBox1.Controls.Add(this.lblX);
+			this.groupBox1.Controls.Add(this.btnStore);
+			this.groupBox1.Enabled = false;
+			this.groupBox1.Location = new System.Drawing.Point(7, 55);
+			this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.groupBox1.Name = "groupBox1";
+			this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.groupBox1.Size = new System.Drawing.Size(395, 94);
+			this.groupBox1.TabIndex = 26;
+			this.groupBox1.TabStop = false;
+			this.groupBox1.Text = "Data Information";
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(175, 10);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(55, 16);
+			this.label1.TabIndex = 28;
+			this.label1.Text = "Iteration:";
+			// 
+			// txtCounter
+			// 
+			this.txtCounter.BackColor = System.Drawing.Color.WhiteSmoke;
+			this.txtCounter.Font = new System.Drawing.Font("Calibri", 14.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.txtCounter.Location = new System.Drawing.Point(178, 34);
+			this.txtCounter.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.txtCounter.Multiline = true;
+			this.txtCounter.Name = "txtCounter";
+			this.txtCounter.Size = new System.Drawing.Size(77, 44);
+			this.txtCounter.TabIndex = 27;
+			this.txtCounter.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+			this.txtCounter.TextChanged += new System.EventHandler(this.txtCounter_TextChanged);
+			// 
+			// menuStrip1
+			// 
+			this.menuStrip1.Font = new System.Drawing.Font("Calibri", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.helpToolStripMenuItem});
+			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+			this.menuStrip1.Name = "menuStrip1";
+			this.menuStrip1.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
+			this.menuStrip1.Size = new System.Drawing.Size(485, 24);
+			this.menuStrip1.TabIndex = 26;
+			this.menuStrip1.Text = "menuStrip1";
+			this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
+			// 
+			// helpToolStripMenuItem
+			// 
+			this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exitToolStripMenuItem});
+			this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+			this.helpToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
+			this.helpToolStripMenuItem.Text = "Help";
+			// 
+			// exitToolStripMenuItem
+			// 
+			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+			this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.exitToolStripMenuItem.Text = "Exit";
+			this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+			// 
+			// button1
+			// 
+			this.button1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+			this.button1.Location = new System.Drawing.Point(303, 240);
+			this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(93, 28);
+			this.button1.TabIndex = 27;
+			this.button1.Text = "Delete";
+			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.button1_Click);
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(18, 281);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(102, 16);
+			this.label2.TabIndex = 28;
+			this.label2.Text = "Table Of Iteration:";
+			// 
+			// frmMain
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.BackColor = System.Drawing.Color.White;
+			this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
+			this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+			this.ClientSize = new System.Drawing.Size(485, 490);
+			this.Controls.Add(this.label2);
+			this.Controls.Add(this.button1);
+			this.Controls.Add(this.group);
+			this.Controls.Add(this.txtBoxGeneratedFunction);
+			this.Controls.Add(this.dataTable);
+			this.Controls.Add(this.lblFunction);
+			this.Controls.Add(this.menuStrip1);
+			this.Font = new System.Drawing.Font("Franklin Gothic Demi", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.ForeColor = System.Drawing.SystemColors.AppWorkspace;
+			this.MainMenuStrip = this.menuStrip1;
+			this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.Name = "frmMain";
+			this.Text = "Newton\'s Divided Difference";
+			((System.ComponentModel.ISupportInitialize)(this.dataTable)).EndInit();
+			this.group.ResumeLayout(false);
+			this.group.PerformLayout();
+			this.groupBox1.ResumeLayout(false);
+			this.groupBox1.PerformLayout();
+			this.menuStrip1.ResumeLayout(false);
+			this.menuStrip1.PerformLayout();
+			this.ResumeLayout(false);
+			this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.DataGridView dataTable;
+        private System.Windows.Forms.Label lblNumber;
+        private System.Windows.Forms.TextBox txtBoxNumber;
+        private System.Windows.Forms.Label lblX;
+        private System.Windows.Forms.TextBox txtBoxX;
+        private System.Windows.Forms.Label lblFx;
+        private System.Windows.Forms.TextBox txtBoxFx;
+        private System.Windows.Forms.Label lblTarget;
+        private System.Windows.Forms.TextBox txtBoxTarget;
+        private System.Windows.Forms.Button btnEnterNumber;
+        private System.Windows.Forms.Button btnStore;
+        private System.Windows.Forms.Button btnCompute;
+        private System.Windows.Forms.TextBox txtBoxGeneratedFunction;
+        private System.Windows.Forms.Label lblFunction;
+        private System.Windows.Forms.GroupBox group;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+		private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.TextBox txtCounter;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.Label label2;
+    }
+}
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using info.lundin.math;
+
+namespace MP2COE60
+{
+    class NewtonsDivided
+    {
+        //Variables
+        private static int N;
+        private static string temp = "";
+        public static decimal[,] iTable;
+        public static decimal[] dTable;
+        public static decimal[,] List;
+        public static decimal[] xList;
+        public static decimal[] yList;
+        //Logic Functions
+        public void Reset()
+        {
+            dTable = new decimal[5];
+            temp = "";
+            N = 0;
+        }
+        public decimal[,] GetiTable()
+        {
+            return iTable;
+        }
+        public decimal[] GetdTable()
+        {
+            return dTable;
+        }
+        public decimal[,] GetList()
+        {
+            return List;
+        }
+        public string GenerateFunction()
+        {
+            string fnc = yList[0].ToString() + " + ";
+            for (int i = 0; i < (N - 1); i++)
+            {
+                for (int j = 0; j <= i; j++)
+                {
+                    if (xList[j] > 0)
+                        temp += "(x-" + xList[j].ToString() + ")";
+                    else
+                        temp += "(x-(" + xList[j].ToString() + "))";
+                }
+                fnc += List[0, i].ToString();
+                if ((i + 1) != (N - 1))
+                    fnc += temp + " + ";
+                temp = "";
+            }
+            return fnc;
+        }
+        //Interpolation
+        public decimal NewtonsInterpolation(int n, decimal[] xlist, decimal[] ylist, decimal x)
+        {
+            Reset();
+            N = n;
+            List = new decimal[n - 1, n - 1];
+            xList = xlist;
+            yList = ylist;
+                if (x < xlist[0] || x > xlist[n - 1])
+                    MessageBox.Show("Value lies outside the given values of x ");
+                else    
+            {
+            for (int j = 0; j < n - 1; j++)
+            {
+                for (int i = 0; i < n - (j + 1); i++)
+                {
+                    if (j == 0)
+                        List[i, j] = Math.Round((ylist[i + 1] - ylist[i]) / (xlist[i + 1] - xlist[i]), 5);
+                    else
+                        List[i, j] = Math.Round((List[(i + 1), (j - 1)] - List[i, j - 1]) / (xlist[i + (j + 1)] - xlist[i]), 5);
+                }
+            }
+            int k = 0;
+            for (int i = 0; i < n; i++)
+            {
+                if (x > xlist[i])
+                {
+                    k = k + 1;
+                }
+            }
+            k = k - 1;
+            decimal sum = Math.Round(ylist[k], 5);
+            decimal product;
+            for (int i = 0; i < n - (k + 1); i++)
+            {
+                product = 1;
+                for (int j = 0; j <= i; j++)
+                {
+                    product = Math.Round(product * (x - xlist[j + k]), 5);
+                }
+                sum = Math.Round(sum + (List[k, i] * product), 5);
+            }
+            return sum;
+            
+            }
+            return 0;
+        }
+    }
+}
+  
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+
+namespace MP2COE60
+{
+    static class Program
+    {
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new frmMain());
+        }
+    }
+}
+  
+
+

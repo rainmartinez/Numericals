@@ -1,0 +1,130 @@
+
+//Source code for linear regression
+#include <new>
+# include <iostream>
+#include<conio.h>
+#include<cmath>
+#include<Windows.h>
+#include <stdio.h>
+
+using namespace std;
+using std::cout;
+using std::endl;
+using std::cin;
+void linearregression ();
+int main ()
+{
+	HANDLE hConsole;
+	hConsole = GetStdHandle (STD_OUTPUT_HANDLE);
+	system("color 50");
+	cout << "\n\t\t\t......Linear Regression...... " << endl << endl;
+	linearregression();
+}
+void linearregression ()
+{
+HANDLE hConsole;
+hConsole = GetStdHandle (STD_OUTPUT_HANDLE);
+int number, xnumvar, ynumvar;
+cout << " Please enter the number of data points: ";
+cin >> number;
+xnumvar = ynumvar = number;
+cout << endl << endl;
+float xval [1000];
+float yval [1000];
+float xxval [1000];
+float yyval [1000];
+float xyval [1000];
+float sum[1000];
+float xx[1000];
+float yy[1000];
+float xbar, ybar, xxbar, yybar, xybar,sumx=0,sumy=0,sumxy=0,sumxx=0,sumyy=0,r;
+float xwhile = 0, ywhile = 0;
+while (xnumvar > 0)
+{
+	cout << " Please enter x variable number " << (xwhile + 1) <<  ": "; 
+cin >> xval[xnumvar - 1]; 
+cout << endl;
+sumx=sumx+xval[xnumvar - 1];
+xnumvar--;
+xwhile++;
+}
+while (ynumvar > 0) {
+	cout << " Please enter y variable number " << (ywhile + 1) <<  ": ";
+cin >> yval[ynumvar - 1]; 
+cout << endl; 
+sumy=sumy+yval[ynumvar - 1];
+ynumvar--; 
+ywhile++;
+}
+for(int i=0;i<number;i++)
+{
+	sum[i]=yval[i]*xval[i];
+	xx[i]=xval[i]*xval[i];
+	yy[i]=yval[i]*yval[i];
+	sumxy= sumxy+sum[i];
+	sumxx = sumxx+ xx[i];
+	sumyy = sumyy+ yy[i];
+}
+float xbardiv = 0, ybardiv = 0;
+while (xnumvar < number) {xbardiv = xbardiv + (xval[xnumvar]); xnumvar++;}
+while (ynumvar < number) {ybardiv = ybardiv + yval[ynumvar]; ynumvar++;}
+xbar = xbardiv/number;
+ybar = ybardiv/number;
+int xxnumvar = 0, yynumvar = 0, xynumvar = 0;
+while (xxnumvar < number) {xxval[xxnumvar] = xval[xxnumvar]*xval[xxnumvar]; xxnumvar++;}
+while (yynumvar < number) {yyval[yynumvar] = yval[yynumvar]*yval[yynumvar]; yynumvar++;}
+while (xynumvar < number) {xyval[xynumvar] = xval[xynumvar]*yval[xynumvar]; xynumvar++;}
+xxnumvar = yynumvar = xynumvar = 0;
+float xxbardiv = 0, yybardiv = 0, xybardiv = 0;
+while (xxnumvar < number) {xxbardiv = xxbardiv + xxval[xxnumvar]; xxnumvar++;}
+while (yynumvar < number) {yybardiv = yybardiv + yyval[yynumvar]; yynumvar++;}
+while (xynumvar < number) {xybardiv = xybardiv + xyval[xynumvar]; xynumvar++;}
+xxbar = xxbardiv/number;
+yybar = yybardiv/number;
+xybar = xybardiv/number;
+
+float varx, vary, covxy, slope, yint, xdivy, GOF;
+
+varx = xxbar - (xbar * xbar);
+vary = yybar - (ybar * ybar);
+covxy = xybar - (xbar * ybar);
+slope = covxy/varx;
+yint = ybar - (slope * xbar);
+xdivy = varx/vary;
+GOF = slope * slope * xdivy;
+r=((number*sumxy)-(sumx*sumy))/(sqrt(((number*sumxx)-pow(sumx,2))*((number*sumyy)-pow(sumy,2))));
+
+cout << "================================================================================" << endl;
+cout << " The results are the following: " << endl;
+cout << "\n x bar is " << xbar << endl;
+cout << " y bar is " << ybar << endl;
+cout << " x squared bar is " << xxbar << endl;
+cout << " y squared bar is " << yybar << endl;
+cout << " xy bar is " << xybar << endl << endl;
+cout << " The variance of x is " << varx << endl;
+cout << " The variance of y is " << vary << endl;
+cout << " The covariance of x and y is " << covxy << endl;
+cout<<"\n sumxx is "<<sumxx<<endl;
+cout<<" sumxy is "<<sumxy<<endl;
+cout<<" sumyy is "<<sumyy<<endl;
+cout<<" sumx is "<<sumx<<endl;
+cout<<" sumy is "<<sumy<<endl;
+cout<<" a0 is "<<yint<<endl;
+cout<<" a1 is "<<slope<<endl;
+cout<<" f1(x) = "<<yint<<" + "<<slope<<"x\n\n";
+
+
+float x1 = 0, x2 = 1, x3, x4, y1, y2, y3 = 0, y4 = 1;
+y1 = slope*x1 + yint;
+y2 = slope*x2 + yint;
+x3 = (y3 - yint)/slope;
+x4 = (y4 - yint)/slope;
+cout << " Some ordered pairs to graph are: (" << x1 << ", " << y1 << "), " << endl;
+cout << " (" << x2 << ", " << y2 << "), " << endl;
+cout << " (" << x3 << ", " << y3 << "), " << endl;
+cout << " and (" << x4 << ", " << y4 << "). " << endl << endl;
+
+SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+cout<<" correlation coeficient,r is "<<r<<endl;
+_getch();
+}

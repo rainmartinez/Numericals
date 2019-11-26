@@ -1,0 +1,98 @@
+//Source Code for Crout's method
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Crouts_Method
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+            textBox_a11.Select();
+        }
+
+        double l_11, l_21, l_31, u_12, u_13, l_22, l_32, u_23, l_33;
+        double y1_final, y2_final, y3_final, x1_final, x2_final, x3_final;
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            l_11 = Math.Round((double.Parse(textBox_a11.Text)),4);
+            l_21 = Math.Round((double.Parse(textBox_a21.Text)),4);
+            l_31 = Math.Round((double.Parse(textBox_a31.Text)),4);
+
+            u_12 = Math.Round(((double.Parse(textBox_a12.Text)) / l_11),4);
+            u_13 = Math.Round(((double.Parse(textBox_a13.Text)) / l_11),4);
+
+            l_22 = Math.Round(((double.Parse(textBox_a22.Text)) - (l_21 * u_12)),4);
+            l_32 = Math.Round((double.Parse(textBox_a32.Text) - (l_31 * u_12)),4);
+
+            u_23 = Math.Round(((double.Parse(textBox_a23.Text) - (l_21 * u_13)) / l_22),4);
+
+            l_33 = Math.Round((double.Parse(textBox_a33.Text) - (l_31 * u_13) - (l_32 * u_23)),4);
+
+            y1_final = Math.Round((double.Parse(textBox_c1.Text) / l_11),4);
+            y2_final = Math.Round(((double.Parse(textBox_c2.Text) - (l_21 * y1_final)) / l_22),4);
+            y3_final = Math.Round(((double.Parse(textBox_c3.Text) - (l_31 * y1_final) - (l_32 * y2_final)) / l_33),4);
+
+            x3_final = Math.Round(y3_final, 4);
+            x2_final = Math.Round(y2_final - (u_23 * x3_final), 4);
+            x1_final = Math.Round(y1_final - (u_12 * x2_final) - (u_13 * x3_final), 4);
+
+            richTextBox_answer.Text = "\n\n" +
+                                    "\t| " + textBox_a11.Text + "\t" + textBox_a12.Text + "\t" + textBox_a13.Text + " |\n" +
+                                "A = \t| " + textBox_a21.Text + "\t" + textBox_a22.Text + "\t" + textBox_a23.Text + " |\n" +
+                                    "\t| " + textBox_a31.Text + "\t" + textBox_a32.Text + "\t" + textBox_a33.Text + " |\n\n" +
+
+                                    "\t| " + textBox_c1.Text + " |\n" +
+                                "C = \t| " + textBox_c2.Text + " |\n" +
+                                    "\t| " + textBox_c3.Text + " |\n\n" +
+                                "====================================================================\n\n" +
+                                    "                                                                                x                   \n\n" +
+                                    "\t| " + l_11 + "\t" + "0\t0 |\t" + "[ y1 ] =   " + textBox_c1.Text + "\n" +
+                                "L = \t| " + l_21 + "\t" + l_22 + "\t0 |\t" + "[ y2 ] =  " + textBox_c2.Text + "\n" +
+                                    "\t| " + l_31 + "\t" + l_32 + "\t" + l_33 + " |\t" + "[ y3 ] =  " + textBox_c3.Text + "\n\n" +
+
+                                    "                                                                                y                   \n\n" +
+                                    "\t| " + "1\t" + u_12 + "\t" + u_13 + " |\t" + "[ x1 ] =   " + Math.Round(y1_final) + "\n" +
+                                "U = \t| " + "0\t" + "1" + "\t" + u_23 + " |\t" + "[ x2 ] =  " + Math.Round(y2_final) + "\n" +
+                                    "\t| " + "0\t" + "0" + "\t" + "1 |\t" + "[ x3 ] =  " + Math.Round(y3_final) + "\n\n";
+            
+            x1_final = Math.Round(y1_final - (u_12 * x2_final) - (u_13 * x3_final), 4);
+            x2_final = Math.Round(y2_final - (u_23 * x3_final), 4);
+            x3_final = Math.Round(y3_final, 4);
+
+            richTextBox_answer.Text += " x1 =  " + x1_final + "\n x2 =  " + x2_final + "\n x3 =  " + x3_final;
+
+
+           
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            richTextBox_answer.Clear();
+            textBox_a11.Clear();
+            textBox_a12.Clear();
+            textBox_a13.Clear();
+            textBox_a21.Clear();
+            textBox_a22.Clear();
+            textBox_a23.Clear();
+            textBox_a31.Clear();
+            textBox_a32.Clear();
+            textBox_a33.Clear();
+            textBox_c1.Clear();
+            textBox_c2.Clear();
+            textBox_c3.Clear();
+            textBox_a11.Select();
+        }
+        
+    }
+}

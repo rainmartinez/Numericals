@@ -1,0 +1,5 @@
+References Used:
+
+1. Numerical Methods with C++ Programing by Nita H. Shah
+2. www.dailyfreecode.com
+3. Numerical Methods with Computer Programs in C++ by Pallab Ghosh

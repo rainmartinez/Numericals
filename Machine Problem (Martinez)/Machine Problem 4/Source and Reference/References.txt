@@ -1,0 +1,5 @@
+REFERENCES USED:
+1. Practical Numerical Methods with C# by Jack Xu
+2. Numerical Methods, Algorithms and Tools in C# by Waldemar Dos Passos
+
+
